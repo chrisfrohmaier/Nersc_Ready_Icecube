@@ -375,11 +375,11 @@ def add_fakes_2galaxy(science_image,boxsize, xcord_star, ycord_star, newx_star, 
 	hdulist.writeto('Results_V2/Fake_Star_Catalog/'+science_image[1]+'_GMask_V2.fits', clobber=True, output_verify='ignore')
 
 def Sub_ML_DB(science_image):
-	print 'Sub Stuff for:', science_image[1]
-	ref=science_image[0]+science_image[1]
-	new_image=science_image[0]+science_image[1]+'_fakesV1.fits'
+	#print 'Sub Stuff for:', science_image[1]
+	ref=science_image[1]
+	new_image=science_image[1]+'_fakesV2.fits'
 
-	subprocess.call('/project/projectdirs/deepsky/rates/icecube/scripts/diffem $'+str(ref)+' $'+str(new_image)+'', shell=True)
+	subprocess.call('cd '+str(science_image[0])+'; /project/projectdirs/deepsky/rates/icecube/scripts/diffem $'+str(ref)+'.fits $'+str(new_image)+'', shell=True)
 
 def Execute(run):
 	#print '!!!!!!', run
@@ -480,7 +480,7 @@ def Run_All_V2():
 				all_fits.append([dirpath, file])
 	#print all_fits
 	test_files=0
-	testlim=10
+	testlim=200
 
 
 	science_fits=[]
@@ -511,7 +511,7 @@ def Run_All_V2():
 
 	
 	t0=time.time()
-	processors=4
+	processors=8
 	pool=Pool(processors)
 	pool.map(Execute,science_fits)
 	pool.close()
