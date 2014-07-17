@@ -1,0 +1,5 @@
+
+
+cd /Users/cf5g09/Documents/PTF/Icecube/fakes/Extended_Dev
+
+./py_fake.sh 1

@@ -1,0 +1,53 @@
+#!/bin/bash
+
+BINDIR=/project/projectdirs/cmb/modules/carver/hpcports_gnu/wcstools-3.8.7_55c82b60-3.0/bin
+
+  file=$1
+
+  ccd=`${BINDIR}/gethead ccdid ${file}`
+
+  if [ ${#ccd} = 1 ]; then
+    chip=0${ccd}
+  fi
+
+  if [ ${#ccd} = 2 ]; then
+    chip=${ccd}
+  fi
+
+  FLT=`${BINDIR}/gethead FILTER ${file}`
+  date=`${BINDIR}/gethead UTC-OBS ${file}`
+  zp=`${BINDIR}/gethead UB1_ZP ${file}`
+
+  weightln=${file%fits}weight.fits
+
+  yrmndy=` echo ${date%T*} | sed -e 's/-//g' `
+  yrmn=` echo ${yrmndy} | sed -e 's/..$//'  `
+  dy=${yrmndy#${yrmn}}
+  dy=`echo $dy|sed 's/^0*//'`
+
+  if [ $dy -lt 10 ]; then
+   num=0
+  fi
+
+  if [[ $dy -gt 9 && $dy -lt 20 ]]; then
+   num=1
+  fi
+
+  if [ $dy -gt 19 ]; then
+   num=2
+  fi
+
+  calibdir=${yrmn}${num}x
+ 
+
+  if [[ $FLT = 'R' ]]; then
+
+    weight=/project/projectdirs/deepsky/rates/calib/Rband/${calibdir}/mask_C${chip}.fits
+
+  else
+
+    weight=/project/projectdirs/deepsky/rates/calib/gband/${calibdir}/mask_C${chip}.fits
+
+  fi
+
+  cp $weight $weightln 

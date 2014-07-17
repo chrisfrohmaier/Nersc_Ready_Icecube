@@ -1,0 +1,43 @@
+pfld=$1
+
+SUB=/project/projectdirs/deepsky/rates/icecube/scripts/diffem
+fld=${pfld#ptf_}
+
+cd $pfld 
+
+for i in C??
+do
+  cd $i
+
+  for j in PTF*.w_fakesV601.fits
+
+  do
+
+     weight=${j%fits}weight.fits
+     mask=${j%fits}mask.fits
+
+     if [[ ! -a $weight ]]; then
+      oweight=${j%_fakesV601.fits}.weight.fits
+      ln -s $oweight $weight
+     fi
+ 
+     if [[ ! -a $mask ]]; then
+      omask=${j%_fakesV601.fits}.mask.fits
+      ln -s $omask $mask
+     fi
+ 
+     ref=cd.ptf_${fld}_${i#C}_R_first.fits
+
+     if [[ -a $ref ]]; then 
+        $SUB $ref $j
+     else
+        echo $ref 'does not exist, skipping'
+     fi
+
+  done
+
+  cd ../
+
+done
+
+cd ../ 
