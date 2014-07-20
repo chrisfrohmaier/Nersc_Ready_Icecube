@@ -25,6 +25,8 @@ vnum=int(sys.argv[1])
 print 'THIS VNUM IS: ', vnum
 #!!!!!!!!!!!!!!!!IMPORTANT!!!!!!!!!!!!!
 
+
+
 def file_structure(): #This definition creates the file structure for results to be added into
 
 	if not os.path.exists('Results_V'+str(vnum)+''):
@@ -171,14 +173,14 @@ def selecting_galaxies(science_image,): #Finds and creates a catalog of Galxies
 
 		fin=f.readline()
 
-	galaxies_int=galtest.astype(float)
-	hdu_gals=fits.PrimaryHDU(data=galaxies_int,header=header_data)
-	hdu_gals.scale(type='int16')
-	hdulist_gals=fits.HDUList([hdu_gals])
+	#galaxies_int=galtest.astype(float)
+	#hdu_gals=fits.PrimaryHDU(data=galaxies_int,header=header_data)
+	#hdu_gals.scale(type='int16')
+	#hdulist_gals=fits.HDUList([hdu_gals])
 
 	#print hdulist.info()
-	hdulist_gals.writeto('Results_V'+str(vnum)+'/Galaxies/'+science_image[1]+'_GALAXIES_V'+str(vnum)+'.fits', clobber=True, output_verify='ignore')
-	hdulist_gals.close()		
+	#hdulist_gals.writeto('Results_V'+str(vnum)+'/Galaxies/'+science_image[1]+'_GALAXIES_V'+str(vnum)+'.fits', clobber=True, output_verify='ignore')
+	#hdulist_gals.close()		
 	#numpy.savetxt('Results_V'+str(vnum)+'/Galaxies/'+science_image[1]+'_Galaxy_Grids.dat', galaxy_area, delimiter=' ',fmt='%d')
 	#print 'Finished Doing Galaxy Stuff: ', science_image
 	f.close()
@@ -618,4 +620,4 @@ def Run_All(masterlist):
 	pool.close()
 
 	print 'V'+str(vnum)+' took: ', time.time()-t0, 'seconds'
-Run_All('Nam_List.dat')
+Run_All('Master.list')
