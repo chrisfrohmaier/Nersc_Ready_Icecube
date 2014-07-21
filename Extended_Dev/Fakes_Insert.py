@@ -149,7 +149,7 @@ def selecting_galaxies(science_image,): #Finds and creates a catalog of Galxies
 
 		if class_s<0.5 and gal_mag>14 and gal_mag<30:
 			#if FWHM<15:
-			if xcord>20.0 and xcord<2028.0 and ycord>20.0 and ycord<4076.0: #No Edge Galaxies
+			if xcord>21.0 and xcord<2027.0 and ycord>21.0 and ycord<4075.0: #No Edge Galaxies
 				g.write(fin)
 				#g.write(str((ln[0]))+' '+str((ln[1]))+' '+str((ln[2]))+' '+str((ln[3]))+' '+str((ln[4]))+' '+str(ln[5])+' '+str((ln[6]))+' '+str((ln[7]))+' '+str((ln[8]))+' '+str((ln[9]))+' '+str((ln[10]))+' '+str((ln[11]))+' '+str(ln[12])+' '+str((ln[13]))+' '+str((ln[14]))+' '+str((ln[15]))+' '+str((ln[16]))+'\n')
 				l.write(str(xcord)+' '+str(ycord)+'\n')
@@ -228,7 +228,7 @@ def add_fakes_2galaxy(science_image,boxsize, xcord_star, ycord_star, newx_star, 
 	h=open('Results_V'+str(vnum)+'/Galaxies/'+science_image[1]+'_Galaxy_Catalog_V'+str(vnum)+'.cat') #Opens the Galaxy catalog
 	f=open('Results_V'+str(vnum)+'/Fake_Star_Catalog/'+science_image[1]+'_Fake_Star_Catalog_V'+str(vnum)+'.dat','w') #Opens the fake star catalog
 	reg=open('Results_V'+str(vnum)+'/Fake_Star_Catalog/'+science_image[1]+'_Fakes_Star_Regions_V'+str(vnum)+'.reg','w') #creates region file
-	ch=open('Results_V'+str(vnum)+'/Fake_Star_Catalog/'+science_image[1]+'_add_F2G_progress_V'+str(vnum)+'.dat','w') #Debugging file
+	ch=open('Results_V'+str(vnum)+'/Fake_Star_Catalog/'+science_image[1]+'_add_F2G_progress_V'+str(vnum)+'.dat','a') #Debugging file
 
 
 	hin=h.readline() #reads first line
@@ -260,7 +260,7 @@ def add_fakes_2galaxy(science_image,boxsize, xcord_star, ycord_star, newx_star, 
 
 	#print len(fake_star_array), ' Fake Stars have been added to ', len(fake_star_array), ' Galaxies'
 	#print gal_line_array[1]
-	#print 'Number of Fakes to Be added: ', len(xcord_star)
+	#print 'Number of Fakes to Be added to hosts: ', int(len(xcord_star)*0.9)
 	num_of_fakes_all=0
 	#j=open('Results_V'+str(vnum)+'/Fakes_added/'+science_image[1]+'_Flux_Boxes_V'+str(vnum)+'.dat','w')
 	galaxy_mask=numpy.ones((resy,resx),dtype=bool)
@@ -269,7 +269,7 @@ def add_fakes_2galaxy(science_image,boxsize, xcord_star, ycord_star, newx_star, 
 
 		source_star=fake_star_array.pop(random.randrange(0,len(fake_star_array))) #selecting a random source star. Used .pop() so that the same star isnt chosen twice
 
-
+		ch.write(str('!!!!!')+' '+str(num_of_fakes_all)+' '+str('!!!!!')+'\n')
 		#print y
 		#print 'len: ',len(gal_line_array)
 		#ln=host_galaxy.split()
@@ -411,7 +411,7 @@ def add_fakes_2galaxy(science_image,boxsize, xcord_star, ycord_star, newx_star, 
 			back=background_array_star[source_star] #background
 			ch.write(str('Hostless Location: Chosen')+'\n')
 			if galaxy_mask[hostlessy,hostlessx]==False and galareas[hostlessy,hostlessx]==False:
-				print 'Cant Go there<-- Hostless'
+				#print 'Cant Go there<-- Hostless'
 				continue
 			else:
 
@@ -462,7 +462,7 @@ def add_fakes_2galaxy(science_image,boxsize, xcord_star, ycord_star, newx_star, 
 	hdulist_sci.close()
 
 
-	print num_of_fakes_all, 'fake Stars Added to Galaxies and hostless in the Image: ', science_image[1]
+	#print num_of_fakes_all, 'fake Stars Added to Galaxies and hostless in the Image: ', science_image[1]
 	ch.write(str('Num of Fakes Added:')+' '+str(num_of_fakes_all)+'\n')
 	ch.close()
 	#Creating a Galaxy Mask Fits file
@@ -503,7 +503,7 @@ def Execute(run):
 		bad_images=open('Results_V'+str(vnum)+'/Bad_Images_V'+str(vnum)+'.dat','a')
 		bad_images.write(str(science_image[0])+str(science_image[1])+str('.fits')+' '+str('Reason: Astropy Could not Open the .fits file')+'\n')
 		bad_images.close()
-		print 'Cant open Science'
+		#print 'Cant open Science'
 
 
 
@@ -524,7 +524,7 @@ def Execute(run):
 		bad_images=open('Results_V'+str(vnum)+'/Bad_Images_V'+str(vnum)+'.dat','a')
 		bad_images.write(str(science_image[0])+str(science_image[1])+str('.fits')+' '+str('Reason: ELLIP has a NAN')+'\n')
 		bad_images.close()
-		print science_image[0]+science_image[1], ' Has a NAN'
+		#print science_image[0]+science_image[1], ' Has a NAN'
 		return
 	else:
 		ELLIP=float(hdulist_multi_sci[0].header['ELLIP'])
@@ -547,7 +547,7 @@ def Execute(run):
 
 	catsize=Enough_Objects(science_image)
 	if catsize==False:
-			print science_image, 'didn\'t have enough objects detected so it was moved to Results_V'+str(vnum)+'/Bad_Images/ and the newly created weight map, sex file and catalog have been deleted'
+			#print science_image, 'didn\'t have enough objects detected so it was moved to Results_V'+str(vnum)+'/Bad_Images/ and the newly created weight map, sex file and catalog have been deleted'
 			bad_images=open('Results_V'+str(vnum)+'/Bad_Images_V'+str(vnum)+'.dat','a')
 			bad_images.write(str(science_image[0])+str(science_image[1])+str('.fits')+' '+str('Reason: Sextractor did not detect enough objects (<200)')+'\n')
 			os.remove('Results_V'+str(vnum)+'/Catalog/'+science_image[1]+'_Catalog_V'+str(vnum)+'.cat')
@@ -558,8 +558,9 @@ def Execute(run):
 	xcord_star, ycord_star, newx_star, newy_star, mag_array_star, flux_array_star, ran_mag_star, ran_flux_star, background_array_star, scaling_factor_star, CCD_Num_star, faint_fake, mag_best_star, alpha_array, delta_array =Scaling(science_image, x, y, mag, flux, back, zeropoint, fake_stars, CCD_Num, magnitude_best, alpha_sky, delta_sky)
 	#print 'Scaling Done'
 	mag_log=open('Results_V'+str(vnum)+'/Magnitude_Log_File.dat','a')
+	#print 'Maglog Open'
 	mag_log.write(str(science_image[0])+str(science_image[1])+str('.fits')+' '+str(mag[0])+' '+str(mag[-1])+' '+str(faint_fake)+' '+str('22.5')+'\n')
-
+	#print 'Maglogwrite'
 	galareas=selecting_galaxies(science_image)
 	#print 'Selected Galaxies'
 
@@ -629,4 +630,4 @@ def Run_All(masterlist):
 	pool.close()
 
 	print 'V'+str(vnum)+' took: ', time.time()-t0, 'seconds'
-Run_All('Master.list')
+Run_All('Nam_List.dat')
