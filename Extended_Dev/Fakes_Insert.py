@@ -22,6 +22,7 @@ import sys
 global vnum
 vnum=int(sys.argv[1])
 
+#vnum=1
 print 'THIS VNUM IS: ', vnum
 #!!!!!!!!!!!!!!!!IMPORTANT!!!!!!!!!!!!!
 
@@ -124,7 +125,7 @@ def selecting_galaxies(science_image,): #Finds and creates a catalog of Galxies
 	resy=science_data.shape[0]
 	resx=science_data.shape[1]
 	galaxy_area=numpy.ones((resy,resx),dtype=bool)
-	#galtest=numpy.ones((resy,resx),dtype=bool)
+	galtest=numpy.ones((resy,resx),dtype=bool)
 
 	while fin:
 		if fin.startswith('#'):
@@ -142,47 +143,52 @@ def selecting_galaxies(science_image,): #Finds and creates a catalog of Galxies
 		CXX=float(ln[10])
 		CYY=float(ln[11])
 		CXY=float(ln[12])
+		mesrad=int(float((ln[22])))*2
+
 
 
 		FWHM=float(ln[16])
 
+		if int(ln[8])==0:
+			if class_s<0.5 and gal_mag>14 and gal_mag<30:
+				#if FWHM<15:
+				if xcord>40.0 and 2048-xcord>40.0 and ycord>40.0 and 4096-ycord>40.0: #No Edge Galaxies
+					g.write(fin)
+					#g.write(str((ln[0]))+' '+str((ln[1]))+' '+str((ln[2]))+' '+str((ln[3]))+' '+str((ln[4]))+' '+str(ln[5])+' '+str((ln[6]))+' '+str((ln[7]))+' '+str((ln[8]))+' '+str((ln[9]))+' '+str((ln[10]))+' '+str((ln[11]))+' '+str(ln[12])+' '+str((ln[13]))+' '+str((ln[14]))+' '+str((ln[15]))+' '+str((ln[16]))+'\n')
+					l.write(str(xcord)+' '+str(ycord)+'\n')
+					counts+=1
+					gy, gx= numpy.mgrid[(int(ycord)-36):(int(ycord)+36) ,(int(xcord)-36):(int(xcord)+36)]
+					#print gy, gx
 
-		if class_s<0.5 and gal_mag>14 and gal_mag<30:
-			#if FWHM<15:
-			if xcord>21.0 and xcord<2027.0 and ycord>21.0 and ycord<4075.0: #No Edge Galaxies
-				g.write(fin)
-				#g.write(str((ln[0]))+' '+str((ln[1]))+' '+str((ln[2]))+' '+str((ln[3]))+' '+str((ln[4]))+' '+str(ln[5])+' '+str((ln[6]))+' '+str((ln[7]))+' '+str((ln[8]))+' '+str((ln[9]))+' '+str((ln[10]))+' '+str((ln[11]))+' '+str(ln[12])+' '+str((ln[13]))+' '+str((ln[14]))+' '+str((ln[15]))+' '+str((ln[16]))+'\n')
-				l.write(str(xcord)+' '+str(ycord)+'\n')
-				counts+=1
-				gyo,gxo= numpy.indices((40,40))
+					#gx=gxo+(xcord-20)
+					#gy=gyo+(ycord-20)
 
-				gx=gxo+(xcord-20)
-				gy=gyo+(ycord-20)
-
-				a_galaxy=numpy.where(((CXX*((gx-xcord)*(gx-xcord)))+(CYY*((gy-ycord)*(gy-ycord)))+(CXY*((gx-xcord)*(gy-ycord))) <= 3))
+					a_galaxy=numpy.where(((CXX*((gx-xcord)*(gx-xcord)))+(CYY*((gy-ycord)*(gy-ycord)))+(CXY*((gx-xcord)*(gy-ycord))) <= 3))
+					#print a_galaxy
 
 
 
-				galaxy_area[a_galaxy[0]+int(ycord),a_galaxy[1]+int(xcord)]=False
+					galaxy_area[a_galaxy[0]-36+int(ycord),a_galaxy[1]-36+int(xcord)]=False
 
-				#galtest[a_galaxy[0]+int(ycord-36),a_galaxy[1]+int(xcord-36)]=0.0
+				
 
 
 
 
 
 		fin=f.readline()
-
-	#galaxies_int=galtest.astype(float)
-	#hdu_gals=fits.PrimaryHDU(data=galaxies_int,header=header_data)
-	#hdu_gals.scale(type='int16')
-	#hdulist_gals=fits.HDUList([hdu_gals])
+	'''
+	galaxies_int=galaxy_area.astype(float)
+	hdu_gals=fits.PrimaryHDU(data=galaxies_int,header=header_data)
+	hdu_gals.scale(type='int16')
+	hdulist_gals=fits.HDUList([hdu_gals])
 
 	#print hdulist.info()
-	#hdulist_gals.writeto('Results_V'+str(vnum)+'/Galaxies/'+science_image[1]+'_GALAXIES_V'+str(vnum)+'.fits', clobber=True, output_verify='ignore')
-	#hdulist_gals.close()		
+	hdulist_gals.writeto('Results_V'+str(vnum)+'/Galaxies/'+science_image[1]+'_GALAXIES_V'+str(vnum)+'.fits', clobber=True, output_verify='ignore')
+	hdulist_gals.close()		
 	#numpy.savetxt('Results_V'+str(vnum)+'/Galaxies/'+science_image[1]+'_Galaxy_Grids.dat', galaxy_area, delimiter=' ',fmt='%d')
 	#print 'Finished Doing Galaxy Stuff: ', science_image
+	'''
 	f.close()
 	g.close()
 	l.close()
@@ -479,6 +485,7 @@ def add_fakes_2galaxy(science_image,boxsize, xcord_star, ycord_star, newx_star, 
 	'''
 def Execute(run):
 	#print '!!!!!!', run
+	christ=open('Results_V'+str(vnum)+'/Images_Doing'+str(vnum)+'.dat','a')
 	science_image=run
 
 	tstart=time.time()
@@ -508,7 +515,7 @@ def Execute(run):
 
 
 		return
-
+	christ.write(str(science_image[0]+science_image[1])+'.fits'+'\n')
 	hdulist_multi_sci.verify('fix')
 	zeropoint=float(hdulist_multi_sci[0].header['UB1_ZP'])
 	seeing=float(hdulist_multi_sci[0].header['SEEING'])
@@ -555,13 +562,17 @@ def Execute(run):
 
 	x, y, mag, flux, back, magnitude_best, alpha_sky, delta_sky = Selecting_Bright(science_image)
 	#print 'Selecting Bright Done'
+	christ.write(str('Selecting Bright Done: ')+str(science_image[1])+'\n')
 	xcord_star, ycord_star, newx_star, newy_star, mag_array_star, flux_array_star, ran_mag_star, ran_flux_star, background_array_star, scaling_factor_star, CCD_Num_star, faint_fake, mag_best_star, alpha_array, delta_array =Scaling(science_image, x, y, mag, flux, back, zeropoint, fake_stars, CCD_Num, magnitude_best, alpha_sky, delta_sky)
 	#print 'Scaling Done'
+	christ.write(str('Scaling Done: ')+str(science_image[1])+'\n')
 	mag_log=open('Results_V'+str(vnum)+'/Magnitude_Log_File.dat','a')
 	#print 'Maglog Open'
 	mag_log.write(str(science_image[0])+str(science_image[1])+str('.fits')+' '+str(mag[0])+' '+str(mag[-1])+' '+str(faint_fake)+' '+str('22.5')+'\n')
 	#print 'Maglogwrite'
+	christ.write(str('Trying to Find Galaxies: ')+str(science_image[1])+'\n')
 	galareas=selecting_galaxies(science_image)
+	christ.write(str('Found Galaxies: ')+str(science_image[1])+'\n')
 	#print 'Selected Galaxies'
 
 	boxsize=[3,5,7] #This is redundant now, please do not consider this useful.
@@ -571,7 +582,8 @@ def Execute(run):
 
 	good_images=open('Results_V'+str(vnum)+'/Good_Images_V'+str(vnum)+'.dat','a')
 	good_images.write(str(science_image[0])+str(science_image[1])+str('.fits')+' '+str(t_total)+'\n')
-
+	christ.write(str('All Good: ')+str(science_image[1])+'\n')
+	christ.close()
 	#Sub_ML_DB(science_image)
 #-----------------------------------RUN PIPELINE------------------------------------------
 
@@ -622,12 +634,18 @@ def Run_All(masterlist):
 	mag_log_col.write(str('1. Path to Image')+'\n'+str('2. Brightest Source')+'\n'+str('3. Faintest Source Mag')+'\n'+str('4. Brightest Fake')+'\n'+str('5. Faintest Fake'))
 	mag_log_col.close()
 
-
+	
 	t0=time.time()
+	
 	processors=multiprocessing.cpu_count()
 	pool=Pool(processors)
 	pool.map(Execute,science_fits)
 	pool.close()
-
+	'''
+	#Single Core Test, comment out the above Multistuff
+	for run in science_fits:
+		Execute(run)
+	'''
 	print 'V'+str(vnum)+' took: ', time.time()-t0, 'seconds'
-Run_All('Nam_List.dat')
+Run_All('Master.list')
+#Run_All('Nersc_test_List.txt')
